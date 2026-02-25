@@ -29,6 +29,18 @@
             line-height: 1.6;
         }
 
+        /* Logo */
+        .site-logo {
+            position: fixed;
+            top: 20px;
+            left: 24px;
+            z-index: 100;
+            height: 28px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .site-logo:hover { opacity: 1; }
+
         /* Hero */
         .hero {
             min-height: 70vh;
@@ -54,8 +66,24 @@
             font-weight: 700;
             margin-bottom: 16px;
             position: relative;
+            min-height: 1.2em;
         }
         .hero h1 span { color: var(--green); }
+
+        /* Typewriter cursor */
+        .typewriter-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1em;
+            background: var(--green);
+            margin-left: 4px;
+            vertical-align: text-bottom;
+            animation: blink 0.7s step-end infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
         .hero .subtitle {
             font-size: clamp(1.1rem, 2vw, 1.4rem);
             color: var(--light-gray);
@@ -69,6 +97,8 @@
             position: relative;
         }
         .hero .author strong { color: rgba(255,255,255,0.7); }
+        .hero .author a { color: rgba(255,255,255,0.7); text-decoration: none; }
+        .hero .author a:hover { color: var(--green); text-decoration: underline; }
 
         /* Architecture diagram */
         .arch-flow {
@@ -130,9 +160,26 @@
             transform: translateY(-2px);
         }
         .card-icon {
-            font-size: 2rem;
             margin-bottom: 12px;
+            color: var(--green);
         }
+        .card-icon [data-lucide] {
+            width: 32px;
+            height: 32px;
+            stroke-width: 1.5;
+        }
+        .topic-icon {
+            margin-bottom: 10px;
+        }
+        .topic-icon [data-lucide] {
+            width: 24px;
+            height: 24px;
+            stroke-width: 1.5;
+        }
+        .topic-card .topic-icon.ai { color: var(--orange); }
+        .topic-card .topic-icon.data { color: var(--blue); }
+        .topic-card .topic-icon.infra { color: var(--green); }
+        .topic-card .topic-icon.culture { color: var(--purple); }
         .card h3 {
             font-size: 1.15rem;
             margin-bottom: 8px;
@@ -153,7 +200,6 @@
         }
         .tag.md { background: rgba(88,166,255,0.15); color: var(--blue); }
         .tag.json { background: rgba(167,139,250,0.15); color: var(--purple); }
-
 
         /* Monday morning */
         .monday {
@@ -184,23 +230,169 @@
         .monday-text strong { color: var(--white); }
         .monday-text { color: var(--light-gray); font-size: 1.05rem; }
 
+        /* What Else We're Building */
+        .upcoming {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .upcoming h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .upcoming .section-sub {
+            text-align: center;
+            color: var(--light-gray);
+            margin-bottom: 40px;
+            font-size: 1.05rem;
+        }
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        .topic-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 22px;
+            transition: all 0.2s ease;
+        }
+        .topic-card:hover {
+            background: rgba(88,166,255,0.05);
+            border-color: rgba(88,166,255,0.2);
+        }
+        .topic-card .topic-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .topic-card .topic-label.ai { color: var(--orange); }
+        .topic-card .topic-label.data { color: var(--blue); }
+        .topic-card .topic-label.infra { color: var(--green); }
+        .topic-card .topic-label.culture { color: var(--purple); }
+        .topic-card h3 {
+            font-size: 1.05rem;
+            margin-bottom: 6px;
+            color: var(--white);
+        }
+        .topic-card p {
+            font-size: 0.85rem;
+            color: var(--light-gray);
+            line-height: 1.4;
+        }
+
+        /* Newsletter signup */
+        .newsletter {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 50px 20px;
+            text-align: center;
+        }
+        .newsletter h2 {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+        }
+        .newsletter .section-sub {
+            color: var(--light-gray);
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+        .signup-form {
+            display: flex;
+            gap: 10px;
+            max-width: 440px;
+            margin: 0 auto;
+        }
+        .signup-form input[type="email"] {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06);
+            color: var(--white);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .signup-form input[type="email"]::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        .signup-form input[type="email"]:focus {
+            border-color: var(--green);
+        }
+        .signup-form button {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            background: var(--green);
+            color: var(--navy);
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .signup-form button:hover {
+            background: var(--dark-green);
+        }
+        .signup-note {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.3);
+            margin-top: 12px;
+        }
+
         /* Footer */
         footer {
             text-align: center;
-            padding: 40px 20px;
+            padding: 50px 20px 40px;
             border-top: 1px solid rgba(255,255,255,0.05);
-            color: rgba(255,255,255,0.3);
-            font-size: 0.9rem;
         }
-        footer a { color: var(--green); text-decoration: none; }
-        footer a:hover { text-decoration: underline; }
+        .footer-brand {
+            margin-bottom: 24px;
+        }
+        .footer-brand h3 {
+            font-size: 1.1rem;
+            color: var(--white);
+            margin-bottom: 6px;
+        }
+        .footer-brand p {
+            color: var(--light-gray);
+            font-size: 0.9rem;
+            max-width: 480px;
+            margin: 0 auto 16px;
+        }
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        .footer-links a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        .footer-links a:hover { color: var(--green); }
         .footer-quote {
             font-style: italic;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255,255,255,0.35);
             max-width: 500px;
             margin: 0 auto 15px;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
         }
+        footer .footer-credit {
+            color: rgba(255,255,255,0.25);
+            font-size: 0.85rem;
+        }
+        footer .footer-credit a { color: var(--green); text-decoration: none; }
+        footer .footer-credit a:hover { text-decoration: underline; }
 
         /* Floating dots background */
         .floating-dots { position: absolute; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
@@ -220,18 +412,27 @@
             from { opacity: 0; transform: translateY(25px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .hero h1 { animation: fadeUp 0.8s ease both; }
-        .hero .subtitle { animation: fadeUp 0.8s ease 0.2s both; }
-        .hero .arch-flow { animation: fadeUp 0.8s ease 0.4s both; }
-        .hero .author { animation: fadeUp 0.8s ease 0.6s both; }
+        .hero .subtitle { opacity: 0; }
+        .hero .arch-flow { opacity: 0; }
+        .hero .author { opacity: 0; }
+        .subtitle.visible { animation: fadeUp 0.8s ease both; }
+        .arch-flow.visible { animation: fadeUp 0.8s ease both; }
+        .author.visible { animation: fadeUp 0.8s ease both; }
 
         @media (max-width: 600px) {
             .arch-flow { flex-direction: column; }
             .arch-arrow { transform: rotate(90deg); }
+            .signup-form { flex-direction: column; }
+            .site-logo { height: 22px; top: 14px; left: 16px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- Circit logo -->
+    <a href="https://www.circit.io" target="_blank" rel="noopener">
+        <img class="site-logo" src="https://cdn.prod.website-files.com/60f58001b9511460dddf5df0/62694498ec6ab40be18f6772_Circit%20Horizontal%20Logo%20White%20RGB.svg" alt="Circit">
+    </a>
 
     <!-- Hero -->
     <section class="hero">
@@ -253,7 +454,7 @@
             <div class="dot" style="left:88%;animation-delay:7.5s"></div>
             <div class="dot" style="left:35%;animation-delay:9.5s"></div>
         </div>
-        <h1>Meeting Is <span>Data</span></h1>
+        <h1 id="hero-title"></h1>
         <p class="subtitle">How to extract shared context from everyday conversations. A starter kit for building meeting intelligence pipelines.</p>
         <div class="arch-flow">
             <div class="arch-box blue">MS Teams<div class="arch-label">Graph API</div></div>
@@ -264,7 +465,7 @@
             <span class="arch-arrow">&rarr;</span>
             <div class="arch-box purple">Grafana<div class="arch-label">Subscribe & drill down</div></div>
         </div>
-        <p class="author"><strong>Jakub Sikora</strong> &mdash; VP Engineering, Circit</p>
+        <p class="author"><a href="https://www.linkedin.com/in/jakubsikorapl" target="_blank" rel="noopener"><strong>Jakub Sikora</strong></a> &mdash; VP Engineering, <a href="https://www.circit.io" target="_blank" rel="noopener">Circit</a></p>
     </section>
 
 
@@ -274,37 +475,37 @@
         <p class="section-sub">Everything you need to build your own meeting intelligence pipeline. No vendor lock-in, no proprietary tools.</p>
         <div class="grid">
             <a class="card" href="https://github.com/circit-io/meeting-is-data/blob/main/prompt-template.md">
-                <div class="card-icon">&#x1F9E0;</div>
+                <div class="card-icon"><i data-lucide="brain"></i></div>
                 <h3>LLM Prompt Template</h3>
                 <p>Topic classification prompt with taxonomy injection, few-shot examples, and similarity gating patterns.</p>
                 <span class="tag md">Markdown</span>
             </a>
             <a class="card" href="https://github.com/circit-io/meeting-is-data/blob/main/graph-api-queries.md">
-                <div class="card-icon">&#x1F4E1;</div>
+                <div class="card-icon"><i data-lucide="radio"></i></div>
                 <h3>Graph API Queries</h3>
                 <p>Microsoft Graph API endpoints for meetings, transcripts, Copilot AI insights, and Loop notes.</p>
                 <span class="tag md">Markdown</span>
             </a>
             <a class="card" href="https://github.com/circit-io/meeting-is-data/blob/main/pipeline-skeleton.md">
-                <div class="card-icon">&#x2699;&#xFE0F;</div>
+                <div class="card-icon"><i data-lucide="settings"></i></div>
                 <h3>Pipeline Skeleton</h3>
                 <p>18-activity data pipeline pattern. Auth, collect, filter, classify, store. Cloud-agnostic.</p>
                 <span class="tag md">Markdown</span>
             </a>
             <a class="card" href="https://github.com/circit-io/meeting-is-data/blob/main/privacy-checklist.md">
-                <div class="card-icon">&#x1F6E1;&#xFE0F;</div>
+                <div class="card-icon"><i data-lucide="shield-check"></i></div>
                 <h3>Privacy Checklist</h3>
                 <p>4-layer compliance framework: pre-pipeline gatekeeping, consent, PII controls, governance.</p>
                 <span class="tag md">Markdown</span>
             </a>
             <a class="card" href="https://github.com/circit-io/meeting-is-data/blob/main/cost-estimation.md">
-                <div class="card-icon">&#x1F4B0;</div>
+                <div class="card-icon"><i data-lucide="coins"></i></div>
                 <h3>Cost Estimation</h3>
                 <p>Real cost breakdown with estimation worksheet. Know your spend before you build.</p>
                 <span class="tag md">Markdown</span>
             </a>
             <a class="card" href="https://github.com/circit-io/meeting-is-data/blob/main/grafana-dashboard.json">
-                <div class="card-icon">&#x1F4CA;</div>
+                <div class="card-icon"><i data-lucide="bar-chart-3"></i></div>
                 <h3>Grafana Dashboard</h3>
                 <p>Starter dashboard JSON: Topics Overview table, Deep Dive LLM panels, subscription flow.</p>
                 <span class="tag json">JSON</span>
@@ -329,11 +530,157 @@
         </div>
     </section>
 
+    <!-- What Else We're Building -->
+    <section class="upcoming">
+        <h2>What Else We're Building</h2>
+        <p class="section-sub">Meeting intelligence is one piece. Here's what the engineering team at Circit is working on next.</p>
+        <div class="topic-grid">
+            <div class="topic-card">
+                <div class="topic-icon ai"><i data-lucide="bot"></i></div>
+                <div class="topic-label ai">AI</div>
+                <h3>Agentic Investigation System</h3>
+                <p>An autonomous AI agent that chains evidence across financial documents, with a structured evidence ledger and confidence scoring.</p>
+            </div>
+            <div class="topic-card">
+                <div class="topic-icon ai"><i data-lucide="server"></i></div>
+                <div class="topic-label ai">AI</div>
+                <h3>MCP-Based RAG Platform</h3>
+                <p>Internal AI control room connecting Claude and GPT to our knowledge base via Model Context Protocol. Natural language queries over company data.</p>
+            </div>
+            <div class="topic-card">
+                <div class="topic-icon data"><i data-lucide="scan-text"></i></div>
+                <div class="topic-label data">Data</div>
+                <h3>NER for Financial Data</h3>
+                <p>Fine-tuning named entity recognition models with LoRA on financial documents. Training on consumer hardware, deploying to production.</p>
+            </div>
+            <div class="topic-card">
+                <div class="topic-icon infra"><i data-lucide="landmark"></i></div>
+                <div class="topic-label infra">Infrastructure</div>
+                <h3>100+ Bank API Integrations</h3>
+                <p>ETL pipelines connecting to banks across 30+ countries. Dealing with every flavour of API, file format, and authentication scheme imaginable.</p>
+            </div>
+            <div class="topic-card">
+                <div class="topic-icon ai"><i data-lucide="test-tubes"></i></div>
+                <div class="topic-label ai">AI</div>
+                <h3>AI Test Pyramid</h3>
+                <p>Evaluating LLM outputs systematically with Promptfoo. Unit tests for prompts, regression suites, and automated quality gates in CI.</p>
+            </div>
+            <div class="topic-card">
+                <div class="topic-icon culture"><i data-lucide="sparkles"></i></div>
+                <div class="topic-label culture">Engineering</div>
+                <h3>Mages Guild R&D</h3>
+                <p>Our internal R&D division. Engineers get dedicated time to experiment with new technologies before they hit production.</p>
+            </div>
+            <div class="topic-card">
+                <div class="topic-icon data"><i data-lucide="database"></i></div>
+                <div class="topic-label data">Data</div>
+                <h3>NL-to-SQL Analytics</h3>
+                <p>Ask questions in plain English, get SQL queries and charts back. Built on DuckDB with semantic caching for fast iteration.</p>
+            </div>
+            <div class="topic-card">
+                <div class="topic-icon infra"><i data-lucide="shield-check"></i></div>
+                <div class="topic-label infra">Infrastructure</div>
+                <h3>SOC2 + SWIFT Compliance</h3>
+                <p>100% infrastructure-as-code with Azure Bicep. Automated compliance checks, disaster recovery, and security hardening at scale.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter signup -->
+    <section class="newsletter">
+        <h2>Engineering Deep Dives</h2>
+        <p class="section-sub">We'll share detailed write-ups on the topics above. No spam, just engineering.</p>
+        <form class="signup-form" action="https://github.com/circit-io/meeting-is-data/discussions/new?category=general" method="get" target="_blank">
+            <input type="email" placeholder="your@email.com" aria-label="Email address" id="signup-email">
+            <button type="button" onclick="window.open('https://github.com/circit-io/meeting-is-data/discussions/new?category=general&title=Subscribe: ' + encodeURIComponent(document.getElementById('signup-email').value || 'interested'), '_blank')">Notify Me</button>
+        </form>
+        <p class="signup-note">We're setting up a proper newsletter. For now, star the repo or watch for releases.</p>
+    </section>
+
     <!-- Footer -->
     <footer>
+        <div class="footer-brand">
+            <h3>Engineering at Circit</h3>
+            <p>Series B fintech building trust infrastructure for global finance. 30-person product team, 100+ bank integrations, SOC2 + SWIFT certified.</p>
+        </div>
+        <div class="footer-links">
+            <a href="https://www.circit.io/jointheteam" target="_blank" rel="noopener">Open Roles</a>
+            <a href="https://www.linkedin.com/in/jakubsikorapl" target="_blank" rel="noopener">Jakub on LinkedIn</a>
+            <a href="https://www.linkedin.com/company/circit-ltd." target="_blank" rel="noopener">Circit on LinkedIn</a>
+            <a href="https://github.com/circit-io/meeting-is-data" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://github.com/circit-io/meeting-is-data/discussions" target="_blank" rel="noopener">Discussions</a>
+        </div>
         <p class="footer-quote">"A bad system will beat a good person every time." &mdash; W. Edwards Deming</p>
-        <p>Built by <a href="https://github.com/circit-io">Circit Engineering</a> &mdash; <a href="https://github.com/circit-io/meeting-is-data">View on GitHub</a></p>
+        <p class="footer-credit">Built by <a href="https://github.com/circit-io">Circit Engineering</a></p>
     </footer>
+
+    <script src="https://unpkg.com/lucide@0.330.0/dist/umd/lucide.min.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Typewriter effect for hero title
+        (function() {
+            var el = document.getElementById('hero-title');
+            var parts = [
+                { text: 'Meeting Is ', green: false },
+                { text: 'Data', green: true }
+            ];
+            var cursor = document.createElement('span');
+            cursor.className = 'typewriter-cursor';
+            el.appendChild(cursor);
+
+            var partIdx = 0, charIdx = 0;
+            var speed = 70;
+
+            function type() {
+                if (partIdx >= parts.length) {
+                    // Done typing — remove cursor after a pause
+                    setTimeout(function() {
+                        cursor.remove();
+                        // Trigger rest of hero animations
+                        document.querySelector('.hero .subtitle').classList.add('visible');
+                        setTimeout(function() {
+                            document.querySelector('.hero .arch-flow').classList.add('visible');
+                        }, 200);
+                        setTimeout(function() {
+                            document.querySelector('.hero .author').classList.add('visible');
+                        }, 400);
+                    }, 600);
+                    return;
+                }
+                var part = parts[partIdx];
+                if (charIdx === 0 && part.green) {
+                    var span = document.createElement('span');
+                    el.insertBefore(span, cursor);
+                }
+                var target = part.green ? el.querySelector('span:not(.typewriter-cursor)') || el : el;
+                if (part.green) {
+                    var spans = el.querySelectorAll('span:not(.typewriter-cursor)');
+                    target = spans[spans.length - 1];
+                }
+
+                if (charIdx < part.text.length) {
+                    if (part.green) {
+                        target.textContent += part.text[charIdx];
+                    } else {
+                        // Insert text before cursor
+                        var textNode = document.createTextNode(part.text[charIdx]);
+                        el.insertBefore(textNode, cursor);
+                    }
+                    charIdx++;
+                    setTimeout(type, speed);
+                } else {
+                    partIdx++;
+                    charIdx = 0;
+                    setTimeout(type, speed);
+                }
+            }
+
+            // Start after a brief delay
+            setTimeout(type, 400);
+        })();
+    </script>
 
 </body>
 </html>
