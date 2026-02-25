@@ -9,6 +9,11 @@
     <meta property="og:description" content="Companion resources for the conference talk. Everything you need to build a meeting intelligence pipeline.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://circit-io.github.io/meeting-is-data/">
+    <!-- MailerLite Universal Snippet -->
+    <script>
+        (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[]).push(arguments);},l=d.createElement(e),l.async=1,l.src=u,n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})(window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+        ml('account', '2161068');
+    </script>
     <style>
         :root {
             --navy: #0F1419;
@@ -395,16 +400,18 @@
         footer .footer-credit a:hover { text-decoration: underline; }
 
         /* Floating dots background */
-        .floating-dots { position: absolute; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
+        .floating-dots { position: absolute; width: 100%; height: 100%; top: 0; left: 0; overflow: hidden; pointer-events: none; }
         .dot {
             position: absolute; width: 5px; height: 5px; background: var(--green);
-            border-radius: 50%; opacity: 0.3; animation: float 14s linear infinite;
+            border-radius: 50%; opacity: 0; bottom: -10px;
+            animation: float 14s linear infinite;
             box-shadow: 0 0 8px rgba(0,212,170,0.4);
         }
         @keyframes float {
-            from { transform: translateY(100%); opacity: 0; }
-            10% { opacity: 0.25; } 90% { opacity: 0.25; }
-            to { transform: translateY(-500px); opacity: 0; }
+            0% { transform: translateY(0); opacity: 0; }
+            5% { opacity: 0.25; }
+            90% { opacity: 0.2; }
+            100% { transform: translateY(-80vh); opacity: 0; }
         }
 
         /* Fade-in animations */
@@ -590,11 +597,11 @@
     <section class="newsletter">
         <h2>Engineering Deep Dives</h2>
         <p class="section-sub">We'll share detailed write-ups on the topics above. No spam, just engineering.</p>
-        <form class="signup-form" action="https://github.com/circit-io/meeting-is-data/discussions/new?category=general" method="get" target="_blank">
-            <input type="email" placeholder="your@email.com" aria-label="Email address" id="signup-email">
-            <button type="button" onclick="window.open('https://github.com/circit-io/meeting-is-data/discussions/new?category=general&title=Subscribe: ' + encodeURIComponent(document.getElementById('signup-email').value || 'interested'), '_blank')">Notify Me</button>
+        <form class="signup-form" id="ml-signup" onsubmit="return false;">
+            <input type="email" placeholder="your@email.com" aria-label="Email address" id="signup-email" required>
+            <button type="submit" id="signup-btn">Subscribe</button>
         </form>
-        <p class="signup-note">We're setting up a proper newsletter. For now, star the repo or watch for releases.</p>
+        <p class="signup-note" id="signup-note">One email per topic. Unsubscribe anytime.</p>
     </section>
 
     <!-- Footer -->
@@ -616,69 +623,108 @@
 
     <script src="https://unpkg.com/lucide@0.330.0/dist/umd/lucide.min.js"></script>
     <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
-
+        // Initialize Lucide icons (isolated so CDN failure doesn't break page)
+        try { lucide.createIcons(); } catch(e) { console.warn('Lucide icons failed to load:', e); }
+    </script>
+    <script>
         // Typewriter effect for hero title
         (function() {
             var el = document.getElementById('hero-title');
-            var parts = [
-                { text: 'Meeting Is ', green: false },
-                { text: 'Data', green: true }
-            ];
+            if (!el) return;
+
+            var fullText = 'Meeting Is ';
+            var greenText = 'Data';
+            var i = 0;
+            var phase = 0; // 0 = white text, 1 = green text
+            var speed = 70;
+            var greenSpan = null;
+
+            // Create blinking cursor
             var cursor = document.createElement('span');
             cursor.className = 'typewriter-cursor';
             el.appendChild(cursor);
 
-            var partIdx = 0, charIdx = 0;
-            var speed = 70;
+            function revealHero() {
+                cursor.style.animation = 'none';
+                cursor.style.opacity = '0';
+                setTimeout(function() { cursor.remove(); }, 300);
+                var sub = document.querySelector('.hero .subtitle');
+                var arch = document.querySelector('.hero .arch-flow');
+                var auth = document.querySelector('.hero .author');
+                if (sub) sub.classList.add('visible');
+                setTimeout(function() { if (arch) arch.classList.add('visible'); }, 200);
+                setTimeout(function() { if (auth) auth.classList.add('visible'); }, 400);
+            }
 
             function type() {
-                if (partIdx >= parts.length) {
-                    // Done typing — remove cursor after a pause
-                    setTimeout(function() {
-                        cursor.remove();
-                        // Trigger rest of hero animations
-                        document.querySelector('.hero .subtitle').classList.add('visible');
-                        setTimeout(function() {
-                            document.querySelector('.hero .arch-flow').classList.add('visible');
-                        }, 200);
-                        setTimeout(function() {
-                            document.querySelector('.hero .author').classList.add('visible');
-                        }, 400);
-                    }, 600);
-                    return;
-                }
-                var part = parts[partIdx];
-                if (charIdx === 0 && part.green) {
-                    var span = document.createElement('span');
-                    el.insertBefore(span, cursor);
-                }
-                var target = part.green ? el.querySelector('span:not(.typewriter-cursor)') || el : el;
-                if (part.green) {
-                    var spans = el.querySelectorAll('span:not(.typewriter-cursor)');
-                    target = spans[spans.length - 1];
-                }
-
-                if (charIdx < part.text.length) {
-                    if (part.green) {
-                        target.textContent += part.text[charIdx];
+                if (phase === 0) {
+                    if (i < fullText.length) {
+                        el.insertBefore(document.createTextNode(fullText[i]), cursor);
+                        i++;
+                        setTimeout(type, speed);
                     } else {
-                        // Insert text before cursor
-                        var textNode = document.createTextNode(part.text[charIdx]);
-                        el.insertBefore(textNode, cursor);
+                        phase = 1;
+                        i = 0;
+                        greenSpan = document.createElement('span');
+                        el.insertBefore(greenSpan, cursor);
+                        setTimeout(type, speed);
                     }
-                    charIdx++;
-                    setTimeout(type, speed);
                 } else {
-                    partIdx++;
-                    charIdx = 0;
-                    setTimeout(type, speed);
+                    if (i < greenText.length) {
+                        greenSpan.textContent += greenText[i];
+                        i++;
+                        setTimeout(type, speed);
+                    } else {
+                        setTimeout(revealHero, 600);
+                    }
                 }
             }
 
-            // Start after a brief delay
             setTimeout(type, 400);
+        })();
+    </script>
+    <script>
+        // MailerLite newsletter signup
+        (function() {
+            var form = document.getElementById('ml-signup');
+            var emailInput = document.getElementById('signup-email');
+            var btn = document.getElementById('signup-btn');
+            var note = document.getElementById('signup-note');
+            if (!form) return;
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var email = emailInput.value.trim();
+                if (!email) return;
+
+                btn.disabled = true;
+                btn.textContent = 'Sending...';
+
+                var body = 'fields%5Bemail%5D=' + encodeURIComponent(email) + '&ml-submit=1&anticsrf=true&ajax=1';
+                fetch('https://assets.mailerlite.com/jsonp/2142032/forms/180379328232556136/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: body
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        form.innerHTML = '<p style="color:var(--green);font-size:1.1rem;font-weight:600;">You\'re in. Check your email to confirm.</p>';
+                        note.textContent = '';
+                    } else {
+                        btn.disabled = false;
+                        btn.textContent = 'Subscribe';
+                        note.textContent = 'Something went wrong. Please try again.';
+                        note.style.color = 'var(--orange)';
+                    }
+                })
+                .catch(function() {
+                    btn.disabled = false;
+                    btn.textContent = 'Subscribe';
+                    note.textContent = 'Network error. Please try again.';
+                    note.style.color = 'var(--orange)';
+                });
+            });
         })();
     </script>
 
