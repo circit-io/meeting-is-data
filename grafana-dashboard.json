@@ -1,0 +1,205 @@
+{
+  "__doc": "Starter Grafana dashboard for Meeting Topics. Import into Grafana and connect your own datasource.",
+  "dashboard": {
+    "title": "Meeting Topics Overview",
+    "uid": "meeting-topics-starter",
+    "tags": ["meetings", "topics", "starter-kit"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Topics Overview",
+        "description": "All classified topics with meeting counts. Add a Subscribe button column linked to your alerting backend.",
+        "type": "table",
+        "gridPos": { "h": 16, "w": 24, "x": 0, "y": 0 },
+        "targets": [
+          {
+            "rawSql": "SELECT topic, COUNT(DISTINCT meetingId) AS meeting_count, MAX(meetingDate) AS last_seen, MIN(meetingDate) AS first_seen, COUNT(DISTINCT CASE WHEN meetingDate >= DATEADD(day, -7, GETDATE()) THEN meetingId END) AS last_7_days FROM [your_schema].[MeetingCombinedData] GROUP BY topic ORDER BY meeting_count DESC",
+            "format": "table"
+          }
+        ],
+        "fieldConfig": {
+          "overrides": [
+            {
+              "matcher": { "id": "byName", "options": "meeting_count" },
+              "properties": [
+                { "id": "custom.width", "value": 120 },
+                { "id": "displayName", "value": "Meetings" }
+              ]
+            },
+            {
+              "matcher": { "id": "byName", "options": "last_seen" },
+              "properties": [
+                { "id": "custom.width", "value": 150 },
+                { "id": "displayName", "value": "Last Active" }
+              ]
+            },
+            {
+              "matcher": { "id": "byName", "options": "first_seen" },
+              "properties": [
+                { "id": "custom.width", "value": 150 },
+                { "id": "displayName", "value": "First Seen" }
+              ]
+            },
+            {
+              "matcher": { "id": "byName", "options": "last_7_days" },
+              "properties": [
+                { "id": "custom.width", "value": 100 },
+                { "id": "displayName", "value": "Last 7d" },
+                { "id": "custom.cellOptions", "value": { "type": "color-background" } },
+                { "id": "thresholds", "value": { "mode": "absolute", "steps": [
+                  { "color": "transparent", "value": null },
+                  { "color": "rgba(0,212,170,0.15)", "value": 1 },
+                  { "color": "rgba(0,212,170,0.35)", "value": 3 }
+                ]}}
+              ]
+            },
+            {
+              "matcher": { "id": "byName", "options": "topic" },
+              "properties": [
+                { "id": "links", "value": [
+                  {
+                    "title": "Deep Dive",
+                    "url": "/d/meeting-deep-dive-starter?var-topic=${__value.text}",
+                    "targetBlank": false
+                  }
+                ]}
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "templating": {
+      "list": []
+    },
+    "annotations": {
+      "list": []
+    }
+  },
+  "deep_dive_dashboard": {
+    "__doc": "Second dashboard — drill-down per topic. Uses LLM calls via Infinity datasource or precomputed summaries.",
+    "title": "Meeting Topics Deep Dive",
+    "uid": "meeting-deep-dive-starter",
+    "tags": ["meetings", "deep-dive", "llm"],
+    "panels_layout": [
+      {
+        "id": 1,
+        "title": "Select Topic",
+        "type": "variable",
+        "description": "Dashboard variable populated from: SELECT DISTINCT topic FROM MeetingCombinedData ORDER BY topic"
+      },
+      {
+        "id": 2,
+        "title": "Executive Status",
+        "type": "text",
+        "section": "LLM Panels",
+        "description": "LLM-generated executive summary. Feed top 5 meeting summaries for the selected topic as context. Prompt: 'Summarize the current status of this topic in 2-3 sentences. Include risk level.'",
+        "gridPos": { "h": 6, "w": 24, "x": 0, "y": 1 },
+        "infinity_config": {
+          "__doc": "Example Infinity datasource config for calling an LLM API. Adapt the URL and auth to your provider.",
+          "type": "json",
+          "source": "url",
+          "url": "https://your-openai-endpoint.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-08-01-preview",
+          "method": "POST",
+          "headers": [
+            { "key": "api-key", "value": "${AZURE_OPENAI_KEY}" },
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body_type": "raw",
+          "body": "{\"messages\":[{\"role\":\"system\",\"content\":\"You are an executive briefing assistant. Summarize concisely.\"},{\"role\":\"user\",\"content\":\"Topic: ${topic}\\n\\nMeeting summaries:\\n${context}\\n\\nProvide a 2-3 sentence executive status. Include risk level (Low/Medium/High).\"}],\"max_tokens\":300}",
+          "parser": "backend",
+          "uql": "parse-json | scope \"choices\" | project \"message.content\""
+        }
+      },
+      {
+        "id": 3,
+        "title": "Critical Blockers",
+        "type": "text",
+        "section": "LLM Panels",
+        "description": "LLM-generated blocker list. Prompt: 'List the critical blockers mentioned across these meetings. Number each one.'",
+        "gridPos": { "h": 6, "w": 12, "x": 0, "y": 7 }
+      },
+      {
+        "id": 4,
+        "title": "Next Steps",
+        "type": "text",
+        "section": "LLM Panels",
+        "description": "LLM-generated action items. Prompt: 'List the next steps and action items. Number each one.'",
+        "gridPos": { "h": 6, "w": 12, "x": 12, "y": 7 }
+      },
+      {
+        "id": 5,
+        "title": "Context Injector",
+        "type": "hidden",
+        "section": "Data Source",
+        "description": "Hidden panel that queries SQL for the top 5 meeting summaries for the selected topic. Output is stored in a Grafana template variable and injected into the LLM panels above. SQL: SELECT TOP 5 summary, meetingDate FROM MeetingCombinedData WHERE topic = '$topic' ORDER BY meetingDate DESC"
+      },
+      {
+        "id": 6,
+        "title": "Meeting Frequency Trend",
+        "type": "timeseries",
+        "section": "Analytics",
+        "description": "Meetings per week touching this topic. SQL: SELECT DATEPART(week, meetingDate) as week, DATEPART(year, meetingDate) as year, COUNT(*) as meetings FROM MeetingCombinedData WHERE topic = '$topic' GROUP BY DATEPART(year, meetingDate), DATEPART(week, meetingDate) ORDER BY year, week",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 }
+      },
+      {
+        "id": 7,
+        "title": "Co-occurring Topics",
+        "type": "piechart",
+        "section": "Analytics",
+        "description": "Topics that appear in the same meetings as the selected topic. SQL: SELECT t2.topic, COUNT(*) as co_occurrences FROM MeetingCombinedData t1 JOIN MeetingCombinedData t2 ON t1.meetingId = t2.meetingId WHERE t1.topic = '$topic' AND t2.topic != '$topic' GROUP BY t2.topic ORDER BY co_occurrences DESC",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 }
+      },
+      {
+        "id": 8,
+        "title": "Knowledge Graph",
+        "type": "nodeGraph",
+        "section": "Analytics",
+        "description": "Topic relationship visualization. Nodes = topics, edges = co-occurrence in same meeting. Requires Grafana nodeGraph panel. Configure arc fields (arc__this_topic, arc__other) to show relative weight. Use detail__* fields for metadata like last_seen date.",
+        "gridPos": { "h": 10, "w": 24, "x": 0, "y": 21 },
+        "nodeGraph_notes": {
+          "node_fields": "id, title (topic name), subtitle (meeting count), arc__this_topic (float 0-1), arc__other (float 0-1), detail__last_seen (date)",
+          "edge_fields": "id, source, target, mainStat (co-occurrence count)",
+          "arc_colors": "arc__this_topic uses accent color, arc__other uses secondary color"
+        }
+      }
+    ],
+    "llm_integration_notes": {
+      "datasource": "Use the Grafana Infinity datasource plugin to call your LLM API directly from panels. Configure POST requests with JSON body. The plugin auto-sets Content-Type: application/json for JSON queries.",
+      "uql_parsing": "Use UQL (Unstructured Query Language) to parse LLM API responses: 'parse-json | scope \"choices\" | project \"message.content\"'. UQL supports Kusto-like syntax with project, extend, mv-expand commands.",
+      "caching": "Set panel cache timeout to 5 minutes minimum. LLM calls on every page load get expensive fast.",
+      "alternative": "For larger teams, precompute summaries in your nightly pipeline and store them in the warehouse. Query them as regular SQL panels instead of live LLM calls."
+    }
+  },
+  "subscription_flow": {
+    "__doc": "How to implement the Subscribe button on the Topics Overview dashboard.",
+    "steps": [
+      "1. Add a 'Subscribe' column to the Topics Overview table panel using a Grafana data link.",
+      "2. The data link calls your backend API: POST /api/meeting-alerts/subscribe?email={user}&topic={topic}",
+      "3. Your backend (Azure Function, Lambda, etc.) creates a Grafana alert rule via the Grafana Alerting Provisioning API: POST /api/v1/provisioning/alert-rules",
+      "4. The alert rule queries MeetingCombinedData for new meetings matching the topic (e.g., WHERE topic = '$topic' AND meetingDate > NOW() - INTERVAL 1 DAY).",
+      "5. Configure a webhook contact point for notifications. Grafana sends a JSON payload with receiver, status, alerts array (labels, annotations, timestamps).",
+      "6. The webhook payload can be customized using Grafana's notification templates — include a deep link to the Deep Dive dashboard filtered to the topic.",
+      "7. When the nightly pipeline processes new meetings, Grafana evaluates the alert and sends the notification."
+    ],
+    "webhook_payload_example": {
+      "receiver": "meeting-topic-alerts",
+      "status": "firing",
+      "alerts": [
+        {
+          "status": "firing",
+          "labels": {
+            "alertname": "NewMeetingTopicActivity",
+            "topic": "API v3 Migration"
+          },
+          "annotations": {
+            "summary": "3 new meetings about 'API v3 Migration' in the last 24 hours",
+            "dashboard_url": "https://grafana.example.com/d/meeting-deep-dive-starter?var-topic=API%20v3%20Migration"
+          }
+        }
+      ]
+    },
+    "security_note": "Grafana supports HMAC signatures on webhook payloads for authenticity verification."
+  }
+}

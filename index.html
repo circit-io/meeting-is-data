@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Is Data — Starter Kit</title>
+    <meta name="description" content="Build a meeting intelligence pipeline: LLM prompts, Graph API queries, pipeline templates, privacy checklists, and Grafana dashboards.">
+    <meta property="og:title" content="Meeting Is Data — Starter Kit">
+    <meta property="og:description" content="Companion resources for the conference talk. Everything you need to build a meeting intelligence pipeline.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://circit-io.github.io/meeting-is-data/">
+    <style>
+        :root {
+            --navy: #0F1419;
+            --dark-gray: #2C3E50;
+            --green: #00D4AA;
+            --dark-green: #00B894;
+            --light-gray: #95A5A6;
+            --white: #FFFFFF;
+            --blue: #58a6ff;
+            --orange: #f97316;
+            --purple: #a78bfa;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--navy);
+            color: var(--white);
+            line-height: 1.6;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 70vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--dark-gray) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(0,212,170,0.06) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(88,166,255,0.04) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .hero h1 span { color: var(--green); }
+        .hero .subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            color: var(--light-gray);
+            max-width: 600px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .hero .author {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.5);
+            position: relative;
+        }
+        .hero .author strong { color: rgba(255,255,255,0.7); }
+
+        /* Architecture diagram */
+        .arch-flow {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; margin: 40px 0 20px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+        .arch-box {
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+            border: 2px solid;
+        }
+        .arch-box.blue { border-color: var(--blue); color: var(--blue); background: rgba(88,166,255,0.08); }
+        .arch-box.green { border-color: var(--green); color: var(--green); background: rgba(0,212,170,0.08); }
+        .arch-box.orange { border-color: var(--orange); color: var(--orange); background: rgba(249,115,22,0.08); }
+        .arch-box.purple { border-color: var(--purple); color: var(--purple); background: rgba(167,139,250,0.08); }
+        .arch-arrow { color: var(--light-gray); font-size: 1.5rem; }
+        .arch-label { font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+        /* Resources grid */
+        .resources {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        .resources h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .resources .section-sub {
+            text-align: center;
+            color: var(--light-gray);
+            margin-bottom: 40px;
+            font-size: 1.05rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 28px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .card:hover {
+            background: rgba(0,212,170,0.06);
+            border-color: rgba(0,212,170,0.25);
+            transform: translateY(-2px);
+        }
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+        .card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 8px;
+            color: var(--green);
+        }
+        .card p {
+            font-size: 0.95rem;
+            color: var(--light-gray);
+            line-height: 1.5;
+        }
+        .card .tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            margin-top: 12px;
+            font-weight: 600;
+        }
+        .tag.md { background: rgba(88,166,255,0.15); color: var(--blue); }
+        .tag.json { background: rgba(167,139,250,0.15); color: var(--purple); }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            padding: 40px 20px;
+            background: rgba(255,255,255,0.02);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap;
+        }
+        .stat { text-align: center; }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--green);
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--light-gray);
+            margin-top: 6px;
+        }
+
+        /* Monday morning */
+        .monday {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        .monday h2 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .monday-step {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+        .monday-num {
+            flex-shrink: 0;
+            width: 36px; height: 36px;
+            background: rgba(0,212,170,0.15);
+            border: 2px solid var(--green);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.9rem; color: var(--green);
+        }
+        .monday-text strong { color: var(--white); }
+        .monday-text { color: var(--light-gray); font-size: 1.05rem; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.3);
+            font-size: 0.9rem;
+        }
+        footer a { color: var(--green); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+        .footer-quote {
+            font-style: italic;
+            color: rgba(255,255,255,0.5);
+            max-width: 500px;
+            margin: 0 auto 15px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 600px) {
+            .arch-flow { flex-direction: column; }
+            .arch-arrow { transform: rotate(90deg); }
+            .stats-bar { gap: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Meeting Is <span>Data</span></h1>
+        <p class="subtitle">How to extract shared context from everyday conversations. A starter kit for building meeting intelligence pipelines.</p>
+        <div class="arch-flow">
+            <div class="arch-box blue">MS Teams<div class="arch-label">Graph API</div></div>
+            <span class="arch-arrow">&rarr;</span>
+            <div class="arch-box green">ADF / Airflow<div class="arch-label">Nightly batch</div></div>
+            <span class="arch-arrow">&rarr;</span>
+            <div class="arch-box orange">LLM<div class="arch-label">Topic classification</div></div>
+            <span class="arch-arrow">&rarr;</span>
+            <div class="arch-box purple">Grafana<div class="arch-label">Subscribe & drill down</div></div>
+        </div>
+        <p class="author"><strong>Jakub Sikora</strong> &mdash; VP Engineering, Circit</p>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats-bar">
+        <div class="stat">
+            <div class="stat-number">369</div>
+            <div class="stat-label">meetings processed</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">~2 wk</div>
+            <div class="stat-label">to build</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">&euro;150</div>
+            <div class="stat-label">per month total</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">0</div>
+            <div class="stat-label">extra meetings needed</div>
+        </div>
+    </section>
+
+    <!-- Resources -->
+    <section class="resources">
+        <h2>Starter Kit</h2>
+        <p class="section-sub">Everything you need to build your own meeting intelligence pipeline. No vendor lock-in, no proprietary tools.</p>
+        <div class="grid">
+            <a class="card" href="https://github.com/circit-io/meeting-is-data/blob/main/prompt-template.md">
+                <div class="card-icon">&#x1F9E0;</div>
+                <h3>LLM Prompt Template</h3>
+                <p>Topic classification prompt with taxonomy injection, few-shot examples, and similarity gating patterns.</p>
+                <span class="tag md">Markdown</span>
+            </a>
+            <a class="card" href="https://github.com/circit-io/meeting-is-data/blob/main/graph-api-queries.md">
+                <div class="card-icon">&#x1F4E1;</div>
+                <h3>Graph API Queries</h3>
+                <p>Microsoft Graph API endpoints for meetings, transcripts, Copilot AI insights, and Loop notes.</p>
+                <span class="tag md">Markdown</span>
+            </a>
+            <a class="card" href="https://github.com/circit-io/meeting-is-data/blob/main/pipeline-skeleton.md">
+                <div class="card-icon">&#x2699;&#xFE0F;</div>
+                <h3>Pipeline Skeleton</h3>
+                <p>18-activity data pipeline pattern. Auth, collect, filter, classify, store. Cloud-agnostic.</p>
+                <span class="tag md">Markdown</span>
+            </a>
+            <a class="card" href="https://github.com/circit-io/meeting-is-data/blob/main/privacy-checklist.md">
+                <div class="card-icon">&#x1F6E1;&#xFE0F;</div>
+                <h3>Privacy Checklist</h3>
+                <p>4-layer compliance framework: pre-pipeline gatekeeping, consent, PII controls, governance.</p>
+                <span class="tag md">Markdown</span>
+            </a>
+            <a class="card" href="https://github.com/circit-io/meeting-is-data/blob/main/cost-estimation.md">
+                <div class="card-icon">&#x1F4B0;</div>
+                <h3>Cost Estimation</h3>
+                <p>Real cost breakdown with estimation worksheet. Know your spend before you build.</p>
+                <span class="tag md">Markdown</span>
+            </a>
+            <a class="card" href="https://github.com/circit-io/meeting-is-data/blob/main/grafana-dashboard.json">
+                <div class="card-icon">&#x1F4CA;</div>
+                <h3>Grafana Dashboard</h3>
+                <p>Starter dashboard JSON: Topics Overview table, Deep Dive LLM panels, subscription flow.</p>
+                <span class="tag json">JSON</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Monday Morning -->
+    <section class="monday">
+        <h2>Start Monday Morning</h2>
+        <div class="monday-step">
+            <div class="monday-num">1</div>
+            <div class="monday-text"><strong>Count your meetings last month.</strong><br>Open Viva Insights or your calendar. If the number surprises you, you have the problem.</div>
+        </div>
+        <div class="monday-step">
+            <div class="monday-num">2</div>
+            <div class="monday-text"><strong>Ask one lead: "What did you miss from another team?"</strong><br>If they answer immediately, you have your first topic to track.</div>
+        </div>
+        <div class="monday-step">
+            <div class="monday-num">3</div>
+            <div class="monday-text"><strong>List 10 topics your team cares about. Compare to reality.</strong><br>The gap is your starting point. No infrastructure required.</div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p class="footer-quote">"A bad system will beat a good person every time." &mdash; W. Edwards Deming</p>
+        <p>Built by <a href="https://github.com/circit-io">Circit Engineering</a> &mdash; <a href="https://github.com/circit-io/meeting-is-data">View on GitHub</a></p>
+    </footer>
+
+</body>
+</html>
