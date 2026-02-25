@@ -303,10 +303,35 @@
             font-size: 0.95rem;
         }
         .signup-form {
-            display: flex;
-            gap: 10px;
             max-width: 440px;
             margin: 0 auto;
+        }
+        .signup-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .signup-consent {
+            text-align: left;
+            margin-bottom: 10px;
+        }
+        .signup-consent label {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            line-height: 1.4;
+        }
+        .signup-consent label a {
+            color: var(--green);
+            text-decoration: underline;
+        }
+        .signup-consent input[type="checkbox"] {
+            margin-top: 2px;
+            flex-shrink: 0;
+            accent-color: var(--green);
         }
         .signup-form input[type="email"] {
             flex: 1;
@@ -593,10 +618,18 @@
         <h2>Engineering Deep Dives</h2>
         <p class="section-sub">We'll share detailed write-ups on the topics above. No spam, just engineering.</p>
         <form class="signup-form" id="ml-signup">
-            <input type="email" placeholder="your@email.com" aria-label="Email address" id="signup-email" required>
-            <button type="submit" id="signup-btn">Subscribe</button>
+            <div class="signup-row">
+                <input type="email" placeholder="your@email.com" aria-label="Email address" id="signup-email" required>
+                <button type="submit" id="signup-btn">Subscribe</button>
+            </div>
+            <div class="signup-consent">
+                <label><input type="checkbox" id="consent-marketing" required> I agree to receive engineering deep dives and updates from Circit. You can unsubscribe at any time.</label>
+            </div>
+            <div class="signup-consent">
+                <label><input type="checkbox" id="consent-privacy" required> I have read and accept the <a href="https://www.circit.io/legal/privacy-notice" target="_blank" rel="noopener">Privacy Notice</a>. Circit processes personal data on the basis of consent for marketing communications.</label>
+            </div>
         </form>
-        <p class="signup-note" id="signup-note">One email per topic. Unsubscribe anytime.</p>
+        <p class="signup-note" id="signup-note">Contact <a href="mailto:privacy@circit.io" style="color:var(--green)">privacy@circit.io</a> to exercise your data rights.</p>
     </section>
 
     <!-- Footer -->
@@ -684,10 +717,18 @@
             var note = document.getElementById('signup-note');
             if (!form) return;
 
+            var consentMarketing = document.getElementById('consent-marketing');
+            var consentPrivacy = document.getElementById('consent-privacy');
+
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 var email = emailInput.value.trim();
                 if (!email) return;
+                if (!consentMarketing.checked || !consentPrivacy.checked) {
+                    note.textContent = 'Please accept both checkboxes to subscribe.';
+                    note.style.color = 'var(--orange)';
+                    return;
+                }
 
                 btn.disabled = true;
                 btn.textContent = 'Sending...';
