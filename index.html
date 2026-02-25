@@ -645,9 +645,6 @@
             el.appendChild(cursor);
 
             function revealHero() {
-                cursor.style.animation = 'none';
-                cursor.style.opacity = '0';
-                setTimeout(function() { cursor.remove(); }, 300);
                 var sub = document.querySelector('.hero .subtitle');
                 var arch = document.querySelector('.hero .arch-flow');
                 var auth = document.querySelector('.hero .author');
