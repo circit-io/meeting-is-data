@@ -9,11 +9,6 @@
     <meta property="og:description" content="Companion resources for the conference talk. Everything you need to build a meeting intelligence pipeline.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://circit-io.github.io/meeting-is-data/">
-    <!-- MailerLite Universal Snippet -->
-    <script>
-        (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[]).push(arguments);},l=d.createElement(e),l.async=1,l.src=u,n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})(window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
-        ml('account', '2161068');
-    </script>
     <style>
         :root {
             --navy: #0F1419;
@@ -597,7 +592,7 @@
     <section class="newsletter">
         <h2>Engineering Deep Dives</h2>
         <p class="section-sub">We'll share detailed write-ups on the topics above. No spam, just engineering.</p>
-        <form class="signup-form" id="ml-signup" onsubmit="return false;">
+        <form class="signup-form" id="ml-signup">
             <input type="email" placeholder="your@email.com" aria-label="Email address" id="signup-email" required>
             <button type="submit" id="signup-btn">Subscribe</button>
         </form>
@@ -703,22 +698,23 @@
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: body
                 })
-                .then(function(r) { return r.json(); })
+                .then(function(r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
                 .then(function(data) {
                     if (data.success) {
                         form.innerHTML = '<p style="color:var(--green);font-size:1.1rem;font-weight:600;">You\'re in. Check your email to confirm.</p>';
                         note.textContent = '';
                     } else {
-                        btn.disabled = false;
-                        btn.textContent = 'Subscribe';
-                        note.textContent = 'Something went wrong. Please try again.';
-                        note.style.color = 'var(--orange)';
+                        throw new Error('Subscribe failed');
                     }
                 })
-                .catch(function() {
+                .catch(function(err) {
+                    console.error('Newsletter signup error:', err);
                     btn.disabled = false;
                     btn.textContent = 'Subscribe';
-                    note.textContent = 'Network error. Please try again.';
+                    note.textContent = 'Something went wrong. Please try again.';
                     note.style.color = 'var(--orange)';
                 });
             });
